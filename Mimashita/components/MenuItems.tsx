@@ -7,7 +7,7 @@ type Props = { pageName: string; iconName: string; style: any };
 
 // check : https://stackoverflow.com/questions/45706257/react-native-onpress-extract-id-from-currenttarget
 
-export default class TouchableText extends React.PureComponent<Props> {
+export default class MenuItems extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
     this.textPressed = this.textPressed.bind(this);
