@@ -1,59 +1,66 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- * @lint-ignore-every XPLATJSCOPYRIGHT1
- */
-
 import React from "react";
 import { Component } from "react";
 import {
-  Platform,
   StyleSheet,
   View,
-  Text,
-  Button,
   FlatList,
   StatusBar,
   DrawerLayoutAndroid,
-  ToolbarAndroid
+  ToolbarAndroid,
+  Text
 } from "react-native";
+import SplashScreen from "./components/SplashScreen";
 import MenuItems from "./components/MenuItems";
 import Content from "./components/Content";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const instructions = Platform.select({
-  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
-  android:
-    "Double tap R on your keyboard to reload,\n" +
-    "Shake or press menu button for dev menu"
-});
-
 //react-native run-android
 
 type Props = {};
-export default class App extends Component<Props> {
+interface State {
+  dataLoad: boolean;
+  pageName: string;
+  dataContent: any;
+}
+
+export default class App extends Component<Props, State> {
   constructor() {
     super();
     this.state = {
+      dataLoad: false,
       pageName: "Home"
     };
     this.openDrawer = this.openDrawer.bind(this);
+    this.handlePressOnMenu = this.handlePressOnMenu.bind(this);
+    this.handleDataLoad = this.handleDataLoad.bind(this);
   }
 
   openDrawer() {
-    this.drawer.openDrawer();
+    this.menu.openDrawer();
   }
 
-  handlePress = (newPageName) => {
+  handlePressOnMenu = newPageName => {
     this.setState({ pageName: newPageName });
-    this.drawer.closeDrawer();
-  }
+    this.menu.closeDrawer();
+  };
+
+  handleDataLoad(dataFound: any) {
+    this.setState(
+      {
+        data: dataFound,
+        dataLoad: true
+      },
+      function() {
+        console.log("Data load : ");
+        console.log(this.state.dataLoad);
+        console.log(this.state.data);
+        console.log(this.state.pageName);
+      }
+    );
+  } 
 
   render() {
-    var drawer = (
+    var menu = (
       <View style={styles.menu}>
         <FlatList
           data={[
@@ -67,35 +74,41 @@ export default class App extends Component<Props> {
             <MenuItems
               pageName={item.key}
               iconName={item.iconName}
-              onPressItem={this.handlePress}
+              onPressItem={this.handlePressOnMenu}
               style={styles.menuItems}
             />
           )}
         />
       </View>
     );
-    return (
-      <DrawerLayoutAndroid
-        renderNavigationView={() => drawer}
-        drawerWidth={250}
-        ref={_drawer => (this.drawer = _drawer)}
-      >
-      
-        <StatusBar backgroundColor="#A51616" barStyle="light-content" />
-        <Icon.ToolbarAndroid
-          title={this.state.pageName}
-          onIconClicked={this.openDrawer}
-          navIconName="navicon"
-          style={styles.toolbar}
-          titleColor="white"
-          overflowIconName="navicon"
-        />
-        <Content pageName={this.state.pageName} />
 
-      </DrawerLayoutAndroid>
+    return (
+      <View style={{ flex: 1, alignSelf: 'stretch'}}>
+        <StatusBar backgroundColor="#A51616" barStyle="light-content" />
+        {this.state.dataLoad ? (
+          <DrawerLayoutAndroid
+            drawerWidth={300}
+            renderNavigationView={() => menu }
+            ref={_menu => (this.menu = _menu)}
+          >
+            <Icon.ToolbarAndroid
+              title={this.state.pageName}
+              onIconClicked={this.openDrawer}
+              navIconName="navicon"
+              style={styles.toolbar}
+              titleColor="white"
+              overflowIconName="navicon"
+            />
+            <Content pageName={this.state.pageName} />
+          </DrawerLayoutAndroid>
+        ) : (
+          <SplashScreen endSplashScreen={this.handleDataLoad} />
+        )}
+      </View>
     );
   }
 }
+
 
 const styles = StyleSheet.create({
   toolbar: {
