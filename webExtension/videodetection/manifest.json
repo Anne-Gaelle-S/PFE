@@ -1,0 +1,32 @@
+{
+    "manifest_version": 2,
+    "name": "VideoDetection",
+    "version": "1.0",
+  
+    "description": "Détecte lorsque l'utilisateur regarde une vidéo. Fonctionne avec l'application Mimashita.",
+
+    "permissions": [
+      "notifications",
+      "storage"
+    ],
+
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "videodetection@example.com"
+      }
+    },
+
+  
+    "content_scripts": [
+      {
+        "matches": ["*://*.wakanim.tv/*"],
+        "js": ["videodetection-wakanim.js"]
+      },
+      {
+        "matches": ["*://*.crunchyroll.com/*"],
+        "js": ["videodetection-crunchyroll.js"]
+      }
+    ]
+    
+  
+  }
