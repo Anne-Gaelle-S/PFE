@@ -1,3 +1,5 @@
+// import console = require("console");
+
 /************* Crunchyroll *************/
 // For now, only when the site is in french. (We have to change the "É" in Épisode to "E".)
 
@@ -23,21 +25,27 @@ epNumber = epTitle.substring(epTitle.indexOf("Épisode") + 8, epTitle.indexOf(" 
 // alert("epNumber : ||" + epNumber + "||");
 
 
+
 // Make a json object with the Anime name and the episode number. 
 jsonObj = {
   nameAnime: epName,
   nEp: epNumber
 };
 
+
 jsonEp = JSON.stringify(jsonObj);
 
-// alert("Jsonok : " + jsonEp);
 
-// Stock the jsonEp in the localStorage of the phone
-localStorage.setItem('anime' + (localStorage.length + 1).toString(), jsonEp);
-
-// Display the number of "things" there is in the localStorage
-// alert("Nombre d'animes : " + localStorage.length);
+fetch('http://mimashita.im-in.love/animes/userTest', {
+  method: 'POST',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+  body: jsonEp,
+}).catch((error) => {
+  // alert(error);
+});
 
 
 /******************** TO RETREIVE THE ANIME IN LOCALSTORAGE  ********************/
