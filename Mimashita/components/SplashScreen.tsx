@@ -1,6 +1,7 @@
 import React from "react";
 import { Component } from "react";
 import { View, Text } from "react-native";
+import { makeAPIRequest } from './RequesterAniList';
 import Icon from "react-native-vector-icons/FontAwesome";
 
 type Props = {};
@@ -8,78 +9,35 @@ type Props = {};
 export default class SplashScreen extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
-    this.handleResponse = this.handleResponse.bind(this);
-    this.handleData = this.handleData.bind(this);
-    this.handleError = this.handleError.bind(this);
+    this.handleData = this.handleData.bind(this); 
   }
 
   componentDidMount() {
-    // Storing it in a separate .graphql/.gql file is also possible
-    var myQuery = `
-      query ($id: Int, $page: Int, $perPage: Int, $search: String) {
+    var startQuery = `
+        query ($page: Int, $perPage: Int) {
         Page (page: $page, perPage: $perPage) {
-          pageInfo {
-            total
-            currentPage
-            lastPage
-            hasNextPage
-            perPage
-          }
-          media (id: $id, search: $search) {
-            id
+            media (sort: [TRENDING_DESC], type: ANIME) {
             title {
-              romaji 
-              english
-              native
+                romaji 
+                english
+                native
             }
-          }
+          } 
         }
       }
     `;
-
-    // Define our query variables and values that will be used in the query request
-    var myVariables = {
-      search: "A",
+ 
+    var startVariables = {  
       page: 1,
-      perPage: 3
+      perPage: 30
     };
-
-    // Define the config we'll need for our Api request
-    var url = "https://graphql.anilist.co";
-    var options = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        query: myQuery,
-        variables: myVariables
-      })
-    };
-
-    // Make the HTTP Api request
-    fetch(url, options)
-      .then(this.handleResponse)
-      .then(this.handleData)
-      .catch(this.handleError);
+    makeAPIRequest(startQuery, startVariables, this.handleData);
   }
 
-  handleResponse(response) {
-    return response.json().then(function(json) {
-      return response.ok ? json : Promise.reject(json);
-    });
-  }
+  
 
   handleData(data) {
-    console.log("LES DONNEES !!!!!!!!!!!!!!!!!!!!!!! ");
-    console.log(data);
     this.props.endSplashScreen(data);
-  }
-
-  handleError(error) {
-    alert("Error, check console");
-    console.error(error);
   }
 
   render() {

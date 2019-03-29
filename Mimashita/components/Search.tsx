@@ -6,9 +6,11 @@ import {
   View,
   TextInput,
   SectionList,
+  FlatList,
   Button
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { makeAPIRequest } from "./RequesterAniList";
 
 interface Props {
   addPlanToWatch: any;
@@ -16,87 +18,49 @@ interface Props {
 }
 interface State {}
 
-const data = [
-  {
-    initial: "A",
-    data: [
-      {
-        animeTitle: "Albator",
-        seasons: [{ seasonNumber: "1", nbOfEpisodes: "12" }]
-      },
-      {
-        animeTitle: "Angel beats",
-        seasons: [{ seasonNumber: "1", nbOfEpisodes: "13" }]
-      }
-    ]
-  },
-  {
-    initial: "F",
-    data: [
-      {
-        animeTitle: "Fullmetal Alchemist",
-        seasons: [
-          { seasonNumber: "1", nbOfEpisodes: "24" },
-          { seasonNumber: "2", nbOfEpisodes: "24" }
-        ]
-      },
-      {
-        animeTitle: "Full moon",
-        seasons: [{ seasonNumber: "1", nbOfEpisodes: "24" }]
-      }
-    ]
-  },
-  {
-    initial: "N",
-    data: [{ animeTitle: "Naruto", seasons: []}, { animeTitle: "Nanatsu no taizai", seasons: [] }]
-  },
-  {
-    initial: "S",
-    data: [
-      { animeName: "SAO", seasons: [] },
-      { animeName: "Shingeki no kyojin", seasons: []  },
-      { animeName: "Shaman king", seasons: []  },
-      { animeName: "Steins gate", seasons: []  }
-    ]
-  }
-];
-
 export default class Search extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { inputValue: "", matchingAnime: data };
+    this.state = {
+      dataList: this.props.animeTrendingList,
+      inputValue: ""
+    };
     this.searchMatchingAnime = this.searchMatchingAnime.bind(this);
     this.addToPlanToWatch = this.addToPlanToWatch.bind(this);
     this.addToWatched = this.addToWatched.bind(this);
+    this.handleData = this.handleData.bind(this);
   }
 
   searchMatchingAnime(inputValue: string) {
     if (inputValue != "") {
-      // Recherche parmis la BDD la liste des animés commençant par le titre de la recheche
-      // A modifier !
-      let newData = data.find(
-        (section: object) => inputValue[0].toUpperCase() == section.title
-      );
-      // Si on trouve des résultats
-      if (newData) {
-        // Chercher les noms d'animés commançant EXACTEMENT par la recheche de l'user
-        newData.data = newData.data.filter((animeTitle: string) => {
-          const myRegex = new RegExp("^" + inputValue, "i");
-          return myRegex.test(animeTitle);
-        });
-        this.setState({ matchingAnime: [newData] });
-      } else {
-        // Sinon dire qu'on a pas trouvé de résultat
-        this.setState({
-          matchingAnime: [
-            { initial: "", data: ["No anime matches your search, sorry ..."] }
-          ]
-        });
-      }
-      // Si la recheche est vide, afficher toute la listes des animés
+      let query = `
+        query ($id: Int, $page: Int, $perPage: Int, $search: String) {
+          Page (page: $page, perPage: $perPage) {
+            media (id: $id, search: $search, type: ANIME) {
+              title {
+                romaji
+                english
+                native
+              }
+            }
+          }
+        }
+      `; 
+      let variables = {
+          search: inputValue.toString(),
+          page: 1,
+          perPage: 15
+      };
+      makeAPIRequest(query, variables, this.handleData);
     } else {
-      this.setState({ matchingAnime: data });
+      this.setState({ dataList: this.props.animeTrendingList });
     }
+  }
+
+  handleData(data){
+    console.log("DATA RECUPERE : ");
+    console.log(data);
+    this.setState({ dataList: data });
   }
 
   addToPlanToWatch(anime: string) {
@@ -116,14 +80,11 @@ export default class Search extends React.Component<Props, State> {
           onChangeText={inputValue => this.searchMatchingAnime(inputValue)}
         />
 
-        <SectionList
-          sections={this.state.matchingAnime}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.sectionHeader}>{section.initial}</Text>
-          )}
-          renderItem={({ item }) => (
+        <FlatList
+          data={this.state.dataList}
+          renderItem={( { item } ) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>{item}</Text>
+              <Text style={styles.itemText}>{item.key}</Text>
               <View style={styles.itemIcons}>
                 <Icon.Button
                   name="plus-square"
@@ -144,7 +105,6 @@ export default class Search extends React.Component<Props, State> {
               </View>
             </View>
           )}
-          keyExtractor={(item, index) => index}
         />
       </View>
     );
