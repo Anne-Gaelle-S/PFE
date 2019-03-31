@@ -17,8 +17,8 @@ app.get('/animes/:user', function(req, res) {
  	});
 });
 
-// Ecrit dans le fichier user-animes-extensions.json ce qu'on a récupérer avec l'extension web
-// L'etension web envoie une requête POST
+// Ecrit dans le fichier user-animes-extensions.json ce qu'on a récupéré avec l'extension web
+// L'extension web envoie une requête POST
 app.post('/animes/:user', function(req, res) {	
 	fs.readFile((`data/${req.params.user}-animes-extension.json`), (err, data) => {
     		var animesToUpdateJson = {}
