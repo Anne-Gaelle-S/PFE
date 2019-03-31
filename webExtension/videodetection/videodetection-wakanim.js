@@ -53,6 +53,13 @@ fetch('http://mimashita.im-in.love/animes/userTest', {
 });
 
 
+Notification.requestPermission( function(status) {
+  console.log(status); // les notifications ne seront affichées que si "autorisées"
+  var n = new Notification("Détection d'un anime", {
+    body: ("Ouvre l'application Mimashita pour ajouter " + epName + " - Épisode " + epNumber + " à ta liste !")
+  }); // this also shows the notification
+});
+
 /******************** TO RETREIVE THE ANIME IN LOCALSTORAGE  ********************/
 // We have to do this in the application Mimashita when we want to update it. 
 

@@ -55,3 +55,10 @@ fetch('http://mimashita.im-in.love/animes/userTest', {
 // for (i = 1; i <= localStorage.length + 1; i++) {
 //   alert(localStorage.getItem("anime" + i));
 // }
+
+Notification.requestPermission( function(status) {
+  console.log(status); // les notifications ne seront affichées que si "autorisées"
+  var n = new Notification("Détection d'un anime", {
+    body: ("Ouvre l'application Mimashita pour ajouter " + epName + " - Épisode " + epNumber + " à ta liste !")
+  }); // this also shows the notification
+});
