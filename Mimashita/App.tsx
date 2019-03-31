@@ -44,12 +44,14 @@ export default class App extends Component<Props, State> {
     this.menu.closeDrawer();
   };
 
-  handleDataLoad(animeList, animeSuspected) {
+  handleDataLoad(animeTrendingList, animeSuspectedList) {
+    console.log("ANIME TREND: ");
+    console.log(animeTrendingList);
     console.log("ANIME SUSPECTS :");
-    console.log(animeSuspected);
+    console.log(animeSuspectedList);
     this.setState({
-        animeTrendingList: animeList,
-        animeSuspectedWatched: animeSuspected,
+        animeTrending: animeTrendingList,
+        animeSuspected: animeSuspectedList,
         dataLoad: true
     });
   } 
@@ -96,8 +98,8 @@ export default class App extends Component<Props, State> {
             />
             <Content 
               pageName={this.state.pageName} 
-              animeTrendingList={this.state.animeTrendingList} 
-              animeSuspectedWatched={this.state.animeSuspectedWatched}
+              animeTrending={this.state.animeTrending} 
+              animeSuspectedWatched={this.state.animeSuspected}
             />
           </DrawerLayoutAndroid>
         ) : (
