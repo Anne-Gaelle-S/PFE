@@ -44,19 +44,14 @@ export default class App extends Component<Props, State> {
     this.menu.closeDrawer();
   };
 
-  handleDataLoad(dataFound: any) {
-    this.setState(
-      {
-        data: dataFound,
+  handleDataLoad(animeList, animeSuspected) {
+    console.log("ANIME SUSPECTS :");
+    console.log(animeSuspected);
+    this.setState({
+        animeTrendingList: animeList,
+        animeSuspectedWatched: animeSuspected,
         dataLoad: true
-      },
-      function() {
-        console.log("Data load : ");
-        console.log(this.state.dataLoad);
-        console.log(this.state.data);
-        console.log(this.state.pageName);
-      }
-    );
+    });
   } 
 
   render() {
@@ -99,7 +94,11 @@ export default class App extends Component<Props, State> {
               titleColor="white"
               overflowIconName="navicon"
             />
-            <Content pageName={this.state.pageName} />
+            <Content 
+              pageName={this.state.pageName} 
+              animeTrendingList={this.state.animeTrendingList} 
+              animeSuspectedWatched={this.state.animeSuspectedWatched}
+            />
           </DrawerLayoutAndroid>
         ) : (
           <SplashScreen endSplashScreen={this.handleDataLoad} />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Component } from "react";
 import { View, Text } from "react-native";
-import { makeAPIRequest } from './RequesterAniList';
+import { makeAPIRequest, flatData } from "./services/RequesterAniList";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 type Props = {};
@@ -9,7 +9,7 @@ type Props = {};
 export default class SplashScreen extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
-    this.handleData = this.handleData.bind(this); 
+    this.handleData = this.handleData.bind(this);
   }
 
   componentDidMount() {
@@ -26,18 +26,41 @@ export default class SplashScreen extends React.PureComponent<Props> {
         }
       }
     `;
- 
-    var startVariables = {  
+
+    var startVariables = { 
       page: 1,
       perPage: 30
     };
-    makeAPIRequest(startQuery, startVariables, this.handleData);
+
+    makeAPIRequest(startQuery, startVariables, this.handleData, true);
+  }
+  
+  filterDuplicatesAnime(arrayOfAnime){
+    return ( arrayOfAnime
+      .map(JSON.stringify) // to compare json object
+      .filter( (value, index, self) => 
+        self.indexOf(value) == index) // filer duplicates anime
+      .filter( (value, index, self) => {
+        console.log("Value: "+value+"\tindex: "+index+"\tself: "+self);
+        return true; }
+      )
+      .map(JSON.parse) // get it back Array
+    );
   }
 
-  
-
   handleData(data) {
-    this.props.endSplashScreen(data);
+    let animeTrendingData = flatData(data);
+    let myUserName = 'userTest';
+    fetch('http://mimashita.im-in.love/animes/'+myUserName)
+      .then((response) => response.json())
+      .then((json) => {
+        let animeSuspectedWatched = this.filterDuplicatesAnime(json.animesToUpdate)
+        console.log(animeSuspectedWatched);
+        this.props.endSplashScreen(animeTrendingData, animeSuspectedWatched);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   render() {

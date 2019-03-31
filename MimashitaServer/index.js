@@ -5,6 +5,10 @@ const fs = require("fs")
 
 app.use(express.json())
 
+app.get('/', function(req, res) {
+	res.send('It works ! ');
+});
+
 // Récupère les données du fichier d'animes à mettre jour
 // C'est l'application qui va appeler cette fonction quand elle est lancée
 app.get('/animes/:user', function(req, res) {
