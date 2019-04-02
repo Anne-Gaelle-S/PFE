@@ -22,7 +22,7 @@ export default class Search extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      dataList: this.props.animeTrendingList,
+      dataList: this.props.animeTrending,
       inputValue: ""
     };
     this.searchMatchingAnime = this.searchMatchingAnime.bind(this);
@@ -57,15 +57,6 @@ export default class Search extends React.Component<Props, State> {
       this.setState({ dataList: this.props.animeTrendingList });
     }
   }
-
-  // flatData(data) {
-  //   let arrayOfTrendingAnime = data.data.Page.media;
-  //   arrayOfTrendingAnime.map(anAnime => {
-  //     anAnime.key = anAnime.title.romaji;
-  //     return anAnime;
-  //   });
-  //   return arrayOfTrendingAnime;
-  // }
 
   handleData(data){
     let newDataList = flatData(data);

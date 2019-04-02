@@ -13,13 +13,8 @@ import { makeAPIRequest, flatData } from "./../services/RequesterAniList";
 import { storeData, retrieveData } from "./../services/SaverInApp";
 
 interface Props {
-    id: Int;
-    title: String;
-    episodesSeen: Int;
-    episodesTotal: Int;
-    status: String;
-    description: String;
-    showDescription: Boolean;
+  anime: String;
+  episodesSeen: Int;
 }
 interface State {}
 
@@ -27,41 +22,62 @@ export default class Anime extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        id: this.props.id,
-        title: this.props.title,
-        episodesSeen: this.props.episodesSeen,
-        episodesTotal: this.props.episodesTotal,
-        episodesTotalList: [...Array(this.props.episodesTotal).keys()].map(n => n + 1),
-        status: this.props.status,
-        description: this.props.description,
-        showDescription: this.props.showDescription
+      data: {},
+      nbOfEpisodeSeen: this.props.episodesSeen.toString(),
+      romaji: "",
+      status: "",
+      descritption: ""
     };
+    this.handleData = this.handleData.bind(this);
     this.pickerChange = this.pickerChange.bind(this);
     this.addAnimeToMyList = this.addAnimeToMyList.bind(this);
   } 
 
-  componentDidMount(){
-    this.setState({ episodesTotalList :  [...Array(this.props.episodesTotal).keys()].map(n => n + 1) })
-  } 
+  componentDidMount() {
+    var startQuery = `
+            query ($search: String) {
+                Media (search: $search, type: ANIME) {
+                    id,
+                    title {
+                        romaji 
+                        english
+                        native
+                    },
+                    episodes,
+                    status,
+                    description
+                }
+            }
+        `;
+    var startVariables = {
+      search: this.props.anime
+    };
+    makeAPIRequest(startQuery, startVariables, this.handleData);
+  }
+
+  handleData(data) {
+    let flatData = data.data.Media;
+    flatData.episodesSeen = this.props.episodesSeen;
+    this.setState({
+      data: flatData,
+      romaji: flatData.title.romaji,
+      episodes: [...Array(flatData.episodes).keys()].map(n => n + 1),
+      status: flatData.status,
+      descritption: data
+    });
+  }
 
   pickerChange(index) {
     let newData = this.state.data; 
     newData.episodesSeen = (index+1).toString(); 
     this.setState({ 
-      episodesSeen: (index+1).toString(),
+      nbOfEpisodeSeen: (index+1).toString(),
       data : newData 
     });
   }
 
   addAnimeToMyList(){
-    storeData({
-        id: this.state.id,
-        title: this.state.title,
-        episodesSeen: this.state.episodesSeen,
-        episodesTotal: this.state.episodesTotal,
-        description: this.state.description,
-        status: this.state.status
-    });
+    storeData(this.state.data); 
   } 
  
   render() {
@@ -69,36 +85,30 @@ export default class Anime extends React.Component<Props, State> {
       <View style={styles.blockAnime}>
 
         <View style={styles.rowBlock}>
-          <Text style={styles.itemText}>Anime title : {this.state.title}</Text>
+          <Text style={styles.itemText}>Anime title : {this.state.romaji}</Text>
         </View>
 
         <View style={styles.rowBlock}>
           <Text style={styles.itemText}> Episodes seen :</Text>
           <Picker
               style={styles.picker}
-              selectedValue={this.state.episodesSeen}
+              selectedValue={this.state.nbOfEpisodeSeen}
               onValueChange={(item, index) => this.pickerChange(index)}
           >{
-              this.state.episodesTotalList.map(epNumber => {
-                // console.log(epNumber);
-                return (<Picker.Item 
-                      key={this.state.title+epNumber}
-                      label={epNumber.toString()}
-                      value={epNumber.toString()} />) 
-              })
-            }
+              this.state.episodes && (
+                  this.state.episodes.map(epNumber => 
+                      <Picker.Item 
+                          key={this.state.romaji+epNumber}
+                          label={epNumber.toString()}
+                          value={epNumber.toString()} />
+              ))
+          }
           </Picker>
         </View>
 
         <View style={styles.rowBlock}>
           <Text style={styles.itemText}>Status of the anime: {this.state.status}</Text>
-        </View> 
-
-        { this.state.showDescription && (
-            <View style={styles.rowBlock}>
-                <Text style={styles.itemText}>Description: {this.state.description}</Text>
-            </View>
-        )}
+        </View>
 
         <View style={styles.rowBlockCenter}>
           <View style={styles.updateList}>

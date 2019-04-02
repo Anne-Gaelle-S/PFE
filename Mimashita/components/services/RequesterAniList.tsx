@@ -29,7 +29,33 @@ export const makeAPIRequest = (aQuery, someVariables, handleDataFct) => {
   // Make the HTTP Api request
   fetch(url, options)
     .then(handleResponse)
-    .then(data => handleDataFct(data))
+    .then(data => {
+      handleDataFct(data)
+    } )
+    .catch(handleError);
+}
+
+export const makeAPIRequestBis = (aQuery, someVariables, handleDataFct, nEp) => {
+  // Define the config we'll need for our Api request
+  var url = "https://graphql.anilist.co";
+  var options = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      query: aQuery,
+      variables: someVariables
+    })
+  };
+
+  // Make the HTTP Api request
+  fetch(url, options)
+    .then(handleResponse)
+    .then(data => {
+      handleDataFct(data, nEp)
+    } )
     .catch(handleError);
 }
 
@@ -41,25 +67,3 @@ export const flatData = (data) => {
   });
   return arrayOfTrendingAnime;
 }
-
-/*
-var myQuery = `
-    query ($page: Int, $perPage: Int) {
-    Page (page: $page, perPage: $perPage) {
-        media (sort: [TRENDING_DESC], type: ANIME) {
-        title {
-            romaji 
-            english
-            native
-        }
-        }
-    }
-    }
-`;
-
-var myVariables = {
-    page: 1,
-    perPage: 30
-};
-
-*/

@@ -63,7 +63,7 @@ export default class Content extends React.Component<Props> {
           <Search
             addPlanToWatch={this.updatePlanToWatch}
             addToWatched={this.updateWatched}
-            animeTrendingList={this.props.animeTrendingList}
+            animeTrending={this.props.animeTrending}
           />
         )}
 
@@ -81,6 +81,7 @@ export default class Content extends React.Component<Props> {
 const styles = StyleSheet.create({
   Content: {
     flex: 1,
-    backgroundColor: "#242424"
+    backgroundColor: "#242424",
+    paddingBottom: 100 
   }
 });

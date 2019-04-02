@@ -1,7 +1,7 @@
 import React from "react";
 import { Component } from "react";
 import { View, Text } from "react-native";
-import { makeAPIRequest, flatData } from "./services/RequesterAniList";
+import { makeAPIRequest, makeAPIRequestBis, flatData } from "./services/RequesterAniList";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 type Props = {};
@@ -9,58 +9,116 @@ type Props = {};
 export default class SplashScreen extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
-    this.handleData = this.handleData.bind(this);
+    this.state = {
+      trendingAnimeList: [],
+      suspectedAnimeList: [],
+      finishTrendingRequest: false
+    };
+    this.handleTrendingAnime = this.handleTrendingAnime.bind(this);
+    this.requestAllAnime = this.requestAllAnime.bind(this);
+    this.filterDuplicatesAnime = this.filterDuplicatesAnime.bind(this);
+    this.handleAnimeSuspected = this.handleAnimeSuspected.bind(this);
   }
 
   componentDidMount() {
-    var startQuery = `
+    let trendingQuery = `
         query ($page: Int, $perPage: Int) {
         Page (page: $page, perPage: $perPage) {
             media (sort: [TRENDING_DESC], type: ANIME) {
-            title {
-                romaji 
-                english
-                native
-            }
+              id,
+              title {
+                  romaji 
+                  english
+                  native
+              },
+              episodes,
+              status,
+              description
           } 
         }
       }
     `;
-
-    var startVariables = { 
-      page: 1,
-      perPage: 30
-    };
-
-    makeAPIRequest(startQuery, startVariables, this.handleData, true);
-  }
-  
-  filterDuplicatesAnime(arrayOfAnime){
-    return ( arrayOfAnime
-      .map(JSON.stringify) // to compare json object
-      .filter( (value, index, self) => 
-        self.indexOf(value) == index) // filer duplicates anime
-      .filter( (value, index, self) => {
-        console.log("Value: "+value+"\tindex: "+index+"\tself: "+self);
-        return true; }
-      )
-      .map(JSON.parse) // get it back Array
-    );
-  }
-
-  handleData(data) {
-    let animeTrendingData = flatData(data);
+    let trendingVariables = { page: 1, perPage: 30 };
+    makeAPIRequest(trendingQuery, trendingVariables, this.handleTrendingAnime, true);
+    
     let myUserName = 'userTest';
     fetch('http://mimashita.im-in.love/animes/'+myUserName)
       .then((response) => response.json())
       .then((json) => {
-        let animeSuspectedWatched = this.filterDuplicatesAnime(json.animesToUpdate)
-        console.log(animeSuspectedWatched);
-        this.props.endSplashScreen(animeTrendingData, animeSuspectedWatched);
+        this.requestAllAnime(json.animesToUpdate);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => { console.error(error);});
+  }
+  
+  handleTrendingAnime(trendingAnime) {
+    this.setState({
+      trendingAnimeList: flatData(trendingAnime),
+      finishTrendingRequest: true
+    });
+  }
+
+  requestAllAnime(animeWatchedList){
+    let animes = this.filterDuplicatesAnime(animeWatchedList);
+    this.setState({ nbOfAnimeWatched: animes.length});
+    animes.map( (anime) => {
+      let query = `
+          query ($search: String) {
+              Media (search: $search, type: ANIME) {
+                  id,
+                  title {
+                      romaji 
+                      english
+                      native
+                  },
+                  episodes,
+                  status,
+                  description
+              }
+          }
+      `;
+      let variables = { search: anime.nameAnime };
+      makeAPIRequestBis(query, variables, this.handleAnimeSuspected, anime.nEp);
+    });
+  }
+  
+  filterDuplicatesAnime(arrayOfAnime){
+    console.log("ANIME SUSPECTS BEFORE : ");
+    console.log(arrayOfAnime);
+    return ( arrayOfAnime
+      .filter(anime => !isNaN(parseInt(anime.nEp, 10))  )
+      .map(anime => {
+        let res = (arrayOfAnime.reduce( (acc, otherAnime) => {
+          if (anime.nameAnime == otherAnime.nameAnime) {
+              return ((acc.nbEp > otherAnime.otherNbEp) ? acc : otherAnime) 
+          } else {return acc}
+        }));
+        return res;
+      })
+      .map(JSON.stringify) // to compare json object 
+      .filter( (value, index, self) => 
+        self.indexOf(value) == index) // filer duplicates anime
+      .map(JSON.parse)) // get it back Array
+  }
+
+  handleAnimeSuspected(suspectedAnime, nEp){ 
+    let newSuspectedList = [];
+    if (this.state.suspectedAnimeList) {
+      newSuspectedList = this.state.suspectedAnimeList;
+    } 
+    let suspectedAnimeWithEp = suspectedAnime.data.Media;
+    suspectedAnimeWithEp.episodesSeen = nEp;
+    newSuspectedList.push(suspectedAnimeWithEp); 
+
+    this.setState({ suspectedAnimeList: newSuspectedList });
+
+    if(newSuspectedList.length == this.state.nbOfAnimeWatched ){
+      while(this.state.trendingAnime == []){
+        setTimeout(function(){
+          console.log("Waiting trending anime list... ");
+        }, 200);
+      };
+      this.props.endSplashScreen(this.state.trendingAnimeList, newSuspectedList);
+    }
   }
 
   render() {
