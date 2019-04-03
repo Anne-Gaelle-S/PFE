@@ -1,6 +1,6 @@
 import React from "react";
 import { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ImageBackground, StyleSheet } from "react-native";
 import { makeAPIRequest, makeAPIRequestBis, flatData } from "./services/RequesterAniList";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -124,9 +124,26 @@ export default class SplashScreen extends React.PureComponent<Props> {
   render() {
     return (
       <View>
-        <Text>Splash Screen ... </Text>
-        <Text>Please wait we are loading the data ... </Text>
-      </View>
+        <ImageBackground source={require('./assets/bg.jpg')} style={{width: '100%', height: '100%'}}>
+          <View style={styles.title}>
+            <Text style={styles.titleItem}>LOADING</Text>
+            <Text style={styles.titleItem}>PLEASE WAIT...</Text> 
+          </View> 
+        </ImageBackground>
+      </View> 
     );
-  }
+  } 
 }
+
+const styles = StyleSheet.create({
+  title: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  titleItem: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold"
+  }
+});

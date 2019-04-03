@@ -5,12 +5,13 @@ import {
   Text,
   View,
   TextInput,
-  SectionList,
-  FlatList,
+  Picker,
   Button
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { makeAPIRequest, flatData } from "./../services/RequesterAniList";
+import Anime from "./Anime";
+import AccordeonList from "./AccordeonList"
 
 interface Props {
   addPlanToWatch: any;
@@ -22,14 +23,19 @@ export default class Search extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      dataList: this.props.animeTrending,
-      inputValue: ""
+      dataList: this.props.animeTrending, // Array[object]
+      inputValue: "",
+      activeSections: [],
+      showMore: false,
+      sortType: "TRENDING_DESC"
     };
     this.searchMatchingAnime = this.searchMatchingAnime.bind(this);
-    this.addToPlanToWatch = this.addToPlanToWatch.bind(this);
+    this.moreInfos = this.moreInfos.bind(this);
+    this.showAnimeDetails = this.showAnimeDetails.bind(this);
     this.addToWatched = this.addToWatched.bind(this);
     this.handleData = this.handleData.bind(this);
   }
+
 
   searchMatchingAnime(inputValue: string) {
     if (inputValue != "") {
@@ -63,12 +69,35 @@ export default class Search extends React.Component<Props, State> {
     this.setState({ dataList: newDataList });
   }
 
-  addToPlanToWatch(anime: object) {
-    this.props.addPlanToWatch(anime); 
-  }
-
   addToWatched(anime: object) {
     this.props.addToWatched(anime);
+  }
+
+  moreInfos(anime: object) {
+    console.log("MORE INFO:");
+    console.log(anime);
+    this.setState({
+      animeToLook: anime,
+      showMore: true
+    })
+  }
+
+  showAnimeDetails(anime: object){
+    return (<Anime 
+              id={anime.id}
+              title={anime.title.romaji}
+              episodesSeen={0}
+              episodesTotal={anime.episodes}
+              status={anime.status}
+              description={anime.description}
+              showDescription={true}
+            />)
+  }
+
+  pickerChange(index) {
+    // this.setState({ 
+    //   episodesSeen: (index+1).toString()
+    // });
   }
 
   render() {
@@ -80,7 +109,26 @@ export default class Search extends React.Component<Props, State> {
           onChangeText={inputValue => this.searchMatchingAnime(inputValue)}
         />
 
-        <FlatList
+        <View style={styles.rowBlock}>
+          <Text>Sort by : </Text>
+          <Picker
+            selectedValue={this.state.sortType}
+            style={{height: 50, width: 200}}
+            onValueChange={(itemValue, itemIndex) =>
+              this.setState({sortType: itemValue})
+            }>
+            <Picker.Item label="trending desc" value="TRENDING_DESC" />
+            <Picker.Item label="trending" value="TRENDING" />
+            <Picker.Item label="score desc" value="SCORE_DESC" />
+            <Picker.Item label="score" value="SCORE" />
+            <Picker.Item label="title" value="TITLE_ROMAJI" />
+          </Picker>
+        </View>
+
+ 
+        <AccordeonList data={this.state.dataList} style={styles.accordeon} />
+
+     {/* {   <FlatList
           data={this.state.dataList}
           renderItem={( { item } ) => (
             <View style={styles.item}>
@@ -89,7 +137,7 @@ export default class Search extends React.Component<Props, State> {
                 <Icon.Button
                   name="plus-square"
                   backgroundColor="#900"
-                  onPress={() => this.addToPlanToWatch(item)}
+                  onPress={() => this.moreInfos(item)}
                   borderRadius={0}
                   backgroundColor="#242424"
                   color="#900"
@@ -105,15 +153,24 @@ export default class Search extends React.Component<Props, State> {
               </View>
             </View>
           )}
-        />
+        />} */}
+
+       
+
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  rowBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 15
+  },
   searchInput: {
     height: 40,
+    paddingLeft: 15,
     backgroundColor: "white"
   },
   sectionHeader: {
@@ -131,7 +188,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     fontSize: 15,
-    height: 44
+    height: 44,
+    borderBottomColor: 'grey',
+    borderBottomWidth: 3
   },
   itemText: {
     flex: 2,
@@ -142,5 +201,10 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "space-between",
     flexDirection: "row"
+  },
+  accordeon: {
+    backgroundColor: "pink",
+    padding: 2,
+    height: 50 
   }
 });

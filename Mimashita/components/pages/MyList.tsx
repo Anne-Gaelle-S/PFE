@@ -39,8 +39,6 @@ export default class MyList extends React.Component<Props, State> {
   } 
 
   getAllItems(){
-    console.log("__________________________________");
-    console.log("GET ALL ITEMS :");
     AsyncStorage.getAllKeys( (err, keys) => {
       err ? console.err(err) :
       (console.log(keys))
@@ -48,7 +46,6 @@ export default class MyList extends React.Component<Props, State> {
   }
 
   deleteAll(){
-    console.log("Deleting all items");
     AsyncStorage.clear( (err) =>
       err && console.err(err)
     );
