@@ -6,7 +6,8 @@ import {
   View,
   Button, 
   FlatList,
-  Alert
+  Alert,
+  ScrollView
 } from "react-native";
 import Anime from "./Anime";
 
@@ -45,37 +46,41 @@ export default class Home extends React.Component<Props, State> {
           />
         </View>
 
-        <FlatList
-          data={this.props.animeSuspectedWatched}
-          renderItem={({item}) => 
-            <View>
-              <Text style={styles.itemText}>{item.title.romaji} : Episode {item.episodesSeen} </Text> 
-              { <Anime 
-                id={item.id}
-                title={item.title.romaji}
-                episodesSeen={item.episodesSeen}
-                episodesTotal={item.episodes}
-                status={item.status}
-                description={item.description}
-                showDescription={false}
-              />  }
-            </View> 
-          }
-          keyExtractor={(item) => item.id.toString()}
-        />
-        
+        <View style={styles.paddingBot}>
+          <FlatList
+            data={this.props.animeSuspectedWatched}
+            renderItem={({item}) => 
+              <View>
+                <Text style={styles.itemText}>{item.title.romaji} : Episode {item.episodesSeen} </Text> 
+                { <Anime 
+                  id={item.id}
+                  title={item.title.romaji}
+                  episodesSeen={item.episodesSeen}
+                  episodesTotal={item.episodes}
+                  status={item.status}
+                  description={item.description}
+                  showDescription={false}
+                />  }
+              </View> 
+            }
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+      
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  itemText: { color: "white", padding: 7 },
+  itemText: { padding: 5, paddingLeft: 15 },
+  paddingBot: { paddingBottom : 120 },
   rowBlockSpace: {
     padding: 10, 
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "black"
+    borderBottomColor: '#252C68',
+    borderBottomWidth: 3
   }
 });

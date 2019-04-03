@@ -99,7 +99,7 @@ export default class Anime extends React.Component<Props, State> {
         <View style={styles.rowBlockCenter}>
           <View style={styles.updateList}>
             <Button
-                color="black"
+                color="#252C68"
                 onPress={this.addAnimeToMyList}
                 title="Update my list!"
             />
@@ -113,7 +113,7 @@ export default class Anime extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   blockAnime: {
-    backgroundColor: "#424242",
+    backgroundColor: "#BEBEC0",
     marginBottom: 5,
     marginTop: 5,
     padding: 10
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   itemText: { 
     marginRight: 15,
-    color: "white"
+    color: "black" 
   },
   rowBlock: {
     margin: 5,

@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: '500',
-    borderBottomColor: 'grey',
-    borderBottomWidth: 3 
+    borderBottomColor: '#252C68',
+    borderBottomWidth: 1
   },
   content: {
     padding: 20,

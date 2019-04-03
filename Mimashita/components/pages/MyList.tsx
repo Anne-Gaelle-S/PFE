@@ -55,7 +55,7 @@ export default class MyList extends React.Component<Props, State> {
   render() {
     return (
       <ScrollView>
-        <Button 
+        {/* <Button 
           onPress={this.deleteAll}
           title='DELETE ALL'
         /> 
@@ -64,14 +64,13 @@ export default class MyList extends React.Component<Props, State> {
         <Button 
           onPress={this.getAllItems}
           title='GET ALL KEYS'
-        /> 
+        />  */}
 
         { (this.state.animeWatching) && (
             <FlatList
               data={this.state.animeWatching}
               renderItem={({item}) => 
                 <View>
-                  { console.log("EPISODES TOTAL: "+item.episodesTotal) }
                   { <Anime
                     id={item.id}
                     title={item.title}

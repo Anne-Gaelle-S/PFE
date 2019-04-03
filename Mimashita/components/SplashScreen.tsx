@@ -112,11 +112,11 @@ export default class SplashScreen extends React.PureComponent<Props> {
     this.setState({ suspectedAnimeList: newSuspectedList });
 
     if(newSuspectedList.length == this.state.nbOfAnimeWatched ){
-      while(this.state.trendingAnime == []){
-        setTimeout(function(){
-          console.log("Waiting trending anime list... ");
-        }, 200);
-      };
+      // while(this.state.trendingAnime == []){
+      //   setTimeout(function(){
+      //     console.log("Waiting trending anime list... ");
+      //   }, 200);
+      // };
       this.props.endSplashScreen(this.state.trendingAnimeList, newSuspectedList);
     }
   }
@@ -124,7 +124,7 @@ export default class SplashScreen extends React.PureComponent<Props> {
   render() {
     return (
       <View>
-        <ImageBackground source={require('./assets/bg.jpg')} style={{width: '100%', height: '100%'}}>
+        <ImageBackground source={require('./assets/background.png')} style={{width: '100%', height: '100%'}}>
           <View style={styles.title}>
             <Text style={styles.titleItem}>LOADING</Text>
             <Text style={styles.titleItem}>PLEASE WAIT...</Text> 

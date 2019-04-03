@@ -34,15 +34,12 @@ export default class Search extends React.Component<Props, State> {
   } 
 
   updateInput(newInputValue: string){
-    console.log("Input value received : "+newInputValue);
     this.setState({inputValue: newInputValue},
       () => this.searchMatchingAnime());  
   }
 
   searchMatchingAnime() { 
     let searched = this.state.inputValue;
-    console.log("Searching .... "+searched);
-    console.log("Sorted by .... "+this.state.sortType);
     if (searched != "") {
       let query = `
         query ($page: Int, $perPage: Int, $search: String) {
@@ -92,8 +89,6 @@ export default class Search extends React.Component<Props, State> {
 
   handleData(data){
     let newDataList = flatData(data);
-    console.log("New data found from search :");
-    console.log(newDataList);
     this.setState({ dataList: newDataList });
   }
 

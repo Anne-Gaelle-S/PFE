@@ -22,7 +22,7 @@ export default class Content extends React.Component<Props> {
 
   render() {
     return (
-      <View style={styles.Content}>
+      <View style={styles.content}>
 
         {this.props.pageName == "Search" && (
           <Search
@@ -44,9 +44,8 @@ export default class Content extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  Content: {
+  content: {
     flex: 1,
-    backgroundColor: "#D8D8D8", 
-    paddingBottom: 80 
+    backgroundColor: "#D8D8D8"
   }
 });
