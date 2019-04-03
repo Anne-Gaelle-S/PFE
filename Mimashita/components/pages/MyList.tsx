@@ -6,6 +6,7 @@ import {
   View,
   TextInput,
   SectionList,
+  ScrollView,
   Button,
   FlatList
 } from "react-native";
@@ -53,7 +54,7 @@ export default class MyList extends React.Component<Props, State> {
 
   render() {
     return (
-      <View>
+      <ScrollView>
         <Button 
           onPress={this.deleteAll}
           title='DELETE ALL'
@@ -85,7 +86,7 @@ export default class MyList extends React.Component<Props, State> {
               keyExtractor={(item, index) => index.toString()}
             />
         )}
-      </View>
+      </ScrollView>
     );
   }
 }

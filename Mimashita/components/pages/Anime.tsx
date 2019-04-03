@@ -41,22 +41,10 @@ export default class Anime extends React.Component<Props, State> {
   } 
 
   componentDidMount(){
-    console.log("ANIME: ");
-    console.log(this.props.title);
-    console.log(this.props.episodesSeen);
-    console.log(this.props.episodesTotal);
-    console.log(this.props.description);
-
     this.setState({ episodesTotalList :  [...Array(this.props.episodesTotal).keys()].map(n => n + 1) })
   } 
 
-  // componentDidUpdate(props){
-
-  // }
-
   pickerChange(index) {
-    // let newData = this.state.data; 
-    // newData.episodesSeen = (index+1).toString; 
     this.setState({ 
       episodesSeen: (index+1).toString()
     });
@@ -89,7 +77,6 @@ export default class Anime extends React.Component<Props, State> {
               onValueChange={(item, index) => this.pickerChange(index)}
           >{
               this.state.episodesTotalList.map(epNumber => {
-                // console.log(epNumber);
                 return (<Picker.Item 
                       key={this.state.title+epNumber}
                       label={epNumber.toString()}

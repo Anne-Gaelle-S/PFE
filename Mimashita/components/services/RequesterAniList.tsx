@@ -8,7 +8,7 @@ function handleError(error) {
   alert(
     "Network error. Please check your connection then reload the application."
   );
-  console.err(error);
+  console.log(error);
 }
 
 export const makeAPIRequest = (aQuery, someVariables, handleDataFct) => {
@@ -31,7 +31,7 @@ export const makeAPIRequest = (aQuery, someVariables, handleDataFct) => {
     .then(handleResponse)
     .then(data => {
       handleDataFct(data)
-    } )
+    })
     .catch(handleError);
 }
 
@@ -67,3 +67,8 @@ export const flatData = (data) => {
   });
   return arrayOfTrendingAnime;
 }
+
+//content
+//header
+//headerText
+//

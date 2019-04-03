@@ -25,61 +25,76 @@ export default class Search extends React.Component<Props, State> {
     this.state = {
       dataList: this.props.animeTrending, // Array[object]
       inputValue: "",
-      activeSections: [],
-      showMore: false,
-      sortType: "TRENDING_DESC"
+      sortType: "TRENDING_DESC",
+      nbOfResults: 20
     };
+    this.updateInput = this.updateInput.bind(this);
     this.searchMatchingAnime = this.searchMatchingAnime.bind(this);
-    this.moreInfos = this.moreInfos.bind(this);
-    this.showAnimeDetails = this.showAnimeDetails.bind(this);
-    this.addToWatched = this.addToWatched.bind(this);
     this.handleData = this.handleData.bind(this);
+  } 
+
+  updateInput(newInputValue: string){
+    console.log("Input value received : "+newInputValue);
+    this.setState({inputValue: newInputValue},
+      () => this.searchMatchingAnime());  
   }
 
-
-  searchMatchingAnime(inputValue: string) {
-    if (inputValue != "") {
+  searchMatchingAnime() { 
+    let searched = this.state.inputValue;
+    console.log("Searching .... "+searched);
+    console.log("Sorted by .... "+this.state.sortType);
+    if (searched != "") {
       let query = `
-        query ($id: Int, $page: Int, $perPage: Int, $search: String) {
+        query ($page: Int, $perPage: Int, $search: String) {
           Page (page: $page, perPage: $perPage) {
-            media (id: $id, search: $search, type: ANIME) {
-              id
+            media (sort: `+this.state.sortType+`, search: $search, type: ANIME) {
+              id,
               title {
-                romaji
-                english
-                native
-              }
+                  romaji 
+                  english
+                  native
+              },
+              episodes,
+              status,
+              description
             }
           }
         }
       `; 
       let variables = {
-          search: inputValue.toString(),
+          search: searched,
           page: 1,
-          perPage: 30
+          perPage: this.state.nbOfResults
       };
       makeAPIRequest(query, variables, this.handleData);
     } else {
-      this.setState({ dataList: this.props.animeTrendingList });
+      let sortQuery = `
+          query ($page: Int, $perPage: Int) {
+          Page (page: $page, perPage: $perPage) {
+              media (sort: `+this.state.sortType+`, type: ANIME) {
+                id,
+                title {
+                    romaji 
+                    english
+                    native
+                },
+                episodes,
+                status,
+                description
+            } 
+          }
+        }
+      `;
+      let sortVariables = { page: 1, perPage: this.state.nbOfResults };
+      makeAPIRequest(sortQuery, sortVariables, this.handleData);
     }
   }
 
   handleData(data){
     let newDataList = flatData(data);
+    console.log("New data found from search :");
+    console.log(newDataList);
     this.setState({ dataList: newDataList });
-  }
-
-  addToWatched(anime: object) {
-    this.props.addToWatched(anime);
-  }
-
-  moreInfos(anime: object) {
-    console.log("MORE INFO:");
-    console.log(anime);
-    this.setState({
-      animeToLook: anime,
-      showMore: true
-    })
   }
 
   showAnimeDetails(anime: object){
@@ -94,19 +109,13 @@ export default class Search extends React.Component<Props, State> {
             />)
   }
 
-  pickerChange(index) {
-    // this.setState({ 
-    //   episodesSeen: (index+1).toString()
-    // });
-  }
-
   render() {
     return (
       <View>
         <TextInput
           style={styles.searchInput}
           placeholder="Tap a anime name !"
-          onChangeText={inputValue => this.searchMatchingAnime(inputValue)}
+          onChangeText={inputValue => this.updateInput(inputValue)}
         />
 
         <View style={styles.rowBlock}>
@@ -115,18 +124,40 @@ export default class Search extends React.Component<Props, State> {
             selectedValue={this.state.sortType}
             style={{height: 50, width: 200}}
             onValueChange={(itemValue, itemIndex) =>
-              this.setState({sortType: itemValue})
+              this.setState({sortType: itemValue},
+                () => this.searchMatchingAnime()
+              )
             }>
             <Picker.Item label="trending desc" value="TRENDING_DESC" />
             <Picker.Item label="trending" value="TRENDING" />
             <Picker.Item label="score desc" value="SCORE_DESC" />
             <Picker.Item label="score" value="SCORE" />
             <Picker.Item label="title" value="TITLE_ROMAJI" />
+            <Picker.Item label="title desc" value="TITLE_ROMAJI_DESC" />
+          </Picker>
+        </View>
+
+        <View style={styles.rowBlock}>
+          <Text>Number of results : </Text>
+          <Picker
+            selectedValue={this.state.nbOfResults}
+            style={{height: 50, width: 100}}
+            onValueChange={(itemValue, itemIndex) =>
+              this.setState({nbOfResults: itemValue},
+                () => this.searchMatchingAnime()
+              )
+            }>
+            <Picker.Item label="5" value={5} />
+            <Picker.Item label="10" value={10} />
+            <Picker.Item label="20" value={20} />
+            <Picker.Item label="30" value={30} />
+            <Picker.Item label="40" value={40} />
+            <Picker.Item label="50" value={50} />
           </Picker>
         </View>
 
  
-        <AccordeonList data={this.state.dataList} style={styles.accordeon} />
+        <AccordeonList data={this.state.dataList} />
 
      {/* {   <FlatList
           data={this.state.dataList}
@@ -201,10 +232,5 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "space-between",
     flexDirection: "row"
-  },
-  accordeon: {
-    backgroundColor: "pink",
-    padding: 2,
-    height: 50 
   }
 });

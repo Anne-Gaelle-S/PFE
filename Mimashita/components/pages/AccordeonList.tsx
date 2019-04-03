@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import Anime from "./Anime";
 
-// const SECTIONS =
 
 export default class AccordeonList extends Component {
     constructor(props: Props) {
@@ -25,7 +24,18 @@ export default class AccordeonList extends Component {
         this._updateSections = this._updateSections.bind(this);
     };
 
+    componentDidUpdate(prevProps: any): void {
+        const newProps = this.props.data;
+        console.log("UPDATE DATA!");
+        if (newProps != prevProps.data) {  
+            console.log("SOMETHING DIFFERENT! ");
+            this.setState({ sections: this.updateList(this.props.data) });
+        }
+    }
+
     updateList(data){
+        console.log("Accordeon data received: ");
+        console.log(data);
         return (data.map( animeObj => {
             return ({ 
                 "title": animeObj.title.romaji,

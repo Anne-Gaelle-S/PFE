@@ -49,7 +49,7 @@ export default class Home extends React.Component<Props, State> {
           data={this.props.animeSuspectedWatched}
           renderItem={({item}) => 
             <View>
-              <Text style={styles.itemText}>{console.log(item)} {item.title.romaji} : Episode {item.episodesSeen} </Text> 
+              <Text style={styles.itemText}>{item.title.romaji} : Episode {item.episodesSeen} </Text> 
               { <Anime 
                 id={item.id}
                 title={item.title.romaji}
