@@ -44,7 +44,7 @@ fetch('http://mimashita.im-in.love/animes/userTest', {
   },
   body: jsonEp,
 }).catch((error) => {
-  // alert(error);
+  console.err("Error : " + error);
 });
 
 
